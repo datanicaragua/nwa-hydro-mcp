@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nwa-hydro-mcp"
+version = "0.1.0"
+description = "Hydro-Compute MCP Server providing hydrological intelligence to AI agents."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Data Nicaragua" }
+]
+requires-python = ">=3.10"
+dependencies = [
+  "mcp>=0.3.0",
+  "fastmcp>=0.1.0",
+  "pandas>=2.2.0",
+  "xarray>=2024.3",
+  "python-dotenv>=1.0.1",
+  "pydantic>=2.6.0"
+]
+keywords = ["mcp", "hydrology", "agents", "fastmcp"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Scientific/Engineering :: Information Analysis"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "pytest-asyncio>=0.23.0",
+  "ruff>=0.5.0"
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "LICENSE", "README.md"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nwa_hydro"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I", "UP", "B", "W"]
+
+[tool.ruff.lint]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra"
