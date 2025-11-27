@@ -20,5 +20,6 @@ data/*
 
 # Files
 docs/archive/
- .ai/prompts/
+.ai/prompts/
+
 .ai/prompts/
