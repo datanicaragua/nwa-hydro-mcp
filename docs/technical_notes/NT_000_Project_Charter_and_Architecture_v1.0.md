@@ -23,16 +23,16 @@ Due to the critical 72-hour remaining window, we are executing a focused strateg
 
 A FastMCP server (`src/nwa_hydro/server.py`) exposing 3 atomic tools:
 
-1.  **Tool A (Data): `fetch_climate_data`**
-    - **Logic:** Hybrid fetch mechanism. Prioritizes **Open-Meteo ERA5 API** but automatically falls back to `data/local_station.csv` (NWA Archive simulation).
-    - **Goal:** Robustness and Data Fusion demonstration.
-2.  **Tool B (Science): `calculate_hargreaves_eto`**
-    - **Logic:** Scientific implementation using `pyeto` library based on FAO-56 standards. Inputs: $T_{min}, T_{max}, T_{mean}, Lat$.
-    - **Goal:** Domain expertise ("Compute over Retrieval").
-3.  **Tool C (Intelligence): `generate_agronomist_insight`**
-    - **Logic:** Orchestrates a call to **Google Gemini 1.5 Flash**.
-    - **Prompt:** _"Analyze this water deficit (Precipitation - ETo) and provide a 3-bullet executive recommendation for a coffee farmer in Central America."_
-    - **Goal:** Qualify for Google Prize ($30k) and "Creative" category.
+1. **Tool A (Data): `fetch_climate_data`**
+   - **Logic:** Hybrid fetch mechanism. Prioritizes **Open-Meteo ERA5 API** but automatically falls back to `data/local_station.csv` (NWA Archive simulation).
+   - **Goal:** Robustness and Data Fusion demonstration.
+2. **Tool B (Science): `calculate_hargreaves_eto`**
+   - **Logic:** Scientific implementation using `pyeto` library based on FAO-56 standards. Inputs: $T_{min}, T_{max}, T_{mean}, Lat$.
+   - **Goal:** Domain expertise ("Compute over Retrieval").
+3. **Tool C (Intelligence): `generate_agronomist_insight`**
+   - **Logic:** Orchestrates a call to **Google Gemini 2.5 Flash Lite**.
+   - **Prompt:** _"Analyze this water deficit (Precipitation - ETo) and provide a 3-bullet executive recommendation for a coffee farmer in Central America."_
+   - **Goal:** Qualify for Google Prize ($30k) and "Creative" category.
 
 ### 2.2. The Frontend (Web Demo)
 
@@ -86,7 +86,7 @@ nwa-hydro-mcp/
 
 - **Runtime:** Python 3.10+
 - **Protocol:** `mcp` (FastMCP)
-- **AI Models:** Google Gemini 1.5 Flash (`google-generativeai`)
+- **AI Models:** Google Gemini 2.5 Flash Lite (`google-generativeai`)
 - **Scientific Libs:** `pyeto`, `pandas`, `xarray`
 - **Frontend:** `gradio` (v6)
 

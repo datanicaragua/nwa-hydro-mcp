@@ -28,24 +28,30 @@ To prevent "drift" during this high-speed sprint, we rely on a strict **Meta-Pro
 
 On November 27, a critical review of the timeline vs. scope revealed a high risk of non-delivery. A **Strategic Pivot** was executed to maximize prize eligibility:
 
-1.  **Scope Cut (The "No" List):**
-    - **Modal & ElevenLabs:** Removed from scope. Rationale: High integration risk/latency for a developer new to Gradio.
-    - **OpenAI:** Removed. Rationale: Redundant with Gemini/Anthropic.
-2.  **Scope Focus (The "Yes" List):**
-    - **Google Gemini 1.5:** Elevated to "Critical Path". Rationale: Qualifies for the largest prize pool ($30k) and adds high-value semantic intelligence to the app.
-    - **Gradio 6:** Prioritized as the sole Frontend.
+1. **Scope Cut (The "No" List):**
+   - **Modal & ElevenLabs:** Removed from scope. Rationale: High integration risk/latency for a developer new to Gradio.
+   - **OpenAI:** Removed. Rationale: Redundant with Gemini/Anthropic.
+2. **Scope Focus (The "Yes" List):**
+   - **Google Gemini 1.5:** Elevated to "Critical Path". Rationale: Qualifies for the largest prize pool ($30k) and adds high-value semantic intelligence to the app.
+   - **Gradio 6:** Prioritized as the sole Frontend.
+
+### 3.1 Runtime vs. Dev-Agent Models (Decision Log)
+
+- **Decision (Nov 27):** _Option B — Hard Switch to `gemini-1.5-flash` for all production/runtime flows._ The MCP tools (`generate_agronomist_insight`) and Gradio demo MUST call this model exclusively to stay aligned with NT_000 and avoid scope creep.
+- **Development Assistants:** VS Code GitHub Copilot may enable **Gemini 3.0 Pro (Preview)** to aid coding conversations. This does **not** change runtime dependencies or prompts; it only affects which copilot agent helps author code.
+- **Operational Guardrail:** Any future request to upgrade the runtime model requires explicit approval in this Decision Log plus dependency verification in `pyproject.toml` and deployment docs.
 
 ## 4. Security & Release Strategy (The Sunday Protocol)
 
 Given the compressed timeline, security discipline is paramount to avoid leaking API Keys (Gemini) in the rush.
 
-1.  **Strict Isolation:**
-    - `.env` containing `GEMINI_API_KEY` is git-ignored globally.
-    - Hugging Face Spaces Secrets management will be used for deployment, NOT hardcoded strings.
-2.  **The "Squash" Release:**
-    - We continue working in the **Private** repo (`datanicaragua/nwa-hydro-mcp`).
-    - **Sunday Nov 30 (18:00 UTC):** Code Freeze.
-    - **Sunday Nov 30 (19:00 UTC):** Execution of `git merge --squash` to create a clean, professional public history before flipping the repository visibility to **Public**.
+1. **Strict Isolation:**
+   - `.env` containing `GEMINI_API_KEY` is git-ignored globally.
+   - Hugging Face Spaces Secrets management will be used for deployment, NOT hardcoded strings.
+2. **The "Squash" Release:**
+   - We continue working in the **Private** repo (`datanicaragua/nwa-hydro-mcp`).
+   - **Sunday Nov 30 (18:00 UTC):** Code Freeze.
+   - **Sunday Nov 30 (19:00 UTC):** Execution of `git merge --squash` to create a clean, professional public history before flipping the repository visibility to **Public**.
 
 ## 5. Environment & Stack Alignment
 
