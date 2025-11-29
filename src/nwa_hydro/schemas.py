@@ -13,6 +13,8 @@ class ClimateData(BaseModel):
     tmean: float = Field(..., description="Mean temperature in Celsius")
     lat: float = Field(..., description="Latitude of the location")
     source: str = Field(..., description="Source of the data: 'API' or 'CSV'")
+    precipitation: float = Field(0.0, description="Daily precipitation sum in mm")
+    humidity: float = Field(0.0, description="Daily mean relative humidity (0-100)")
 
 class EToResult(BaseModel):
     """
