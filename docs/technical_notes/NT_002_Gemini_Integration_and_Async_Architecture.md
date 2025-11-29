@@ -4,7 +4,7 @@
 | :------------- | :----------------------------------------------------- |
 | **Date**       | 2025-11-29                                             |
 | **Status**     | ✅ Implemented                                         |
-| **Core Stack** | Gemini 2.5 Flash Lite, FastMCP, Gradio 6, Python 3.12+ |
+| **Core Stack** | Gemini 2.5 Flash Lite, FastMCP, Gradio 6, Python 3.10+ |
 | **Context**    | Critical Bug Resolution & Architecture Hardening       |
 
 ## 1. Context & Problem Statement
@@ -13,7 +13,7 @@ During the integration of the Intelligence Layer with the MCP Server and Gradio 
 
 1. **Safety Filters:** Gemini 2.5 returning empty responses for agronomic data.
 2. **Concurrency:** Synchronous calls blocking the UI/MCP Inspector.
-3. **Version Mismatches:** Issues with outdated `google-generativeai` libs and undocumented parameters in the pre-release **Gradio 6**.
+3. **Version Mismatches:** Issues with outdated `google-generativeai` libs and undocumented parameters in **Gradio 6** (e.g., `theme` not accepted by `Blocks`).
 
 ## 2. Technical Solution: The "Defense-in-Depth" Strategy
 
@@ -35,19 +35,12 @@ Refactored `intelligence.py` and `server.py` to use `async/await`. This prevents
 
 ### C. Gradio 6 Inspection & Configuration
 
-Since we are using **Gradio 6 (Winter 2025 Hackathon Edition)**, standard documentation often lags behind the codebase. We utilized Python's `inspect` module to reverse-engineer the available parameters for `gr.Blocks` and `launch()`.
+Since we are using **Gradio 6**, standard documentation often lags behind the codebase. Findings:
 
-**Diagnostic script used to validate API surface:**
+- `theme` is **not** a valid argument to `gr.Blocks` (pass it only to `launch()`).
+- Plotly Express is more stable than manual `go.Figure` for `gr.Plot`; we construct dual-axis charts by merging bar+line traces and setting dark-friendly fonts/grid.
 
-```python
-import gradio as gr
-import inspect
-
-# Validating available themes and launch parameters in Gradio 6
-print(inspect.signature(gr.Blocks))
-print(inspect.signature(gr.Blocks.launch))
-print([m for m in dir(gr.Blocks) if "theme" in m.lower()])
-```
+We used Python's `inspect` module to validate parameters for `gr.Blocks` and `launch()` and avoided undocumented args.
 
 ## 3\. Operational Command Reference (Windows/PowerShell)
 
@@ -97,10 +90,12 @@ _Note: We use `\.venv\Scripts\python.exe` explicitly to avoid conflicts with glo
 | Symptom                                             | Probable Cause                                                   | Fix Command / Action                                                                                                                                   |
 | :-------------------------------------------------- | :--------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`AttributeError: ...response_schema`**            | Outdated Google SDK.                                             | `pip install -U google-generativeai`                                                                                                                   |
+| **`TypeError: BlockContext.__init__() got an unexpected keyword argument 'theme'`** | Passing `theme` to `gr.Blocks` on Gradio 6.                         | Remove `theme` from `Blocks`; pass `theme=` only in `demo.launch(...)`.                                                                                |
 | **`ImportError: relative import...`**               | Running script as `__main__` without package context.            | Prepend `$env:PYTHONPATH = "src";`                                                                                                                     |
 | **`Finish Reason: SAFETY`**                         | Model hallucinating danger in scientific text.                   | Switch to `gemini-2.5-flash-lite` & enforce JSON.                                                                                                      |
 | **`429 Too Many Requests`**                         | Open-Meteo API parallel fetching.                                | Added `asyncio.sleep(0.25)` in data fetch loop.                                                                                                        |
 | **Dev Server Failed (FastMCP)**                     | Port locked or relative import error.                            | Use absolute imports in `server.py` (e.g., `from nwa_hydro.schemas...`).                                                                               |
+| **Dark chart labels invisible**                     | Default Plotly colors on dark background.                        | Set `font.color='#e5e7eb'`, `gridcolor='#374151'`, transparent `plot_bgcolor/paper_bgcolor` in `render_chart`.                                         |
 | **MCP Inspector `ERR_CONNECTION_REFUSED`**          | Browser/VPN blocks IPv6 loopback while inspector binds to `::1`. | Run the helper script (forces IPv4), temporarily disable VPN/Threat Protection, or allow `127.0.0.1` in the firewall.                                  |
 | **Inspector "Invalid origin" / "Connection Error"** | UI missing proxy address/token.                                  | Copy both values printed by the helper script (e.g., `http://127.0.0.1:6277` and session token) into the Connection panel before pressing **Connect**. |
 
