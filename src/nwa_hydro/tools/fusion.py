@@ -19,7 +19,13 @@ async def fetch_climate_data(lat: float, lon: float, target_date: str) -> Climat
                 "longitude": lon,
                 "start_date": target_date,
                 "end_date": target_date,
-                "daily": ["temperature_2m_max", "temperature_2m_min", "temperature_2m_mean"],
+                "daily": [
+                    "temperature_2m_max",
+                    "temperature_2m_min",
+                    "temperature_2m_mean",
+                    "precipitation_sum",
+                    "relative_humidity_2m_mean",
+                ],
                 "timezone": "auto"
             }
             response = await client.get(url, params=params, timeout=5.0)
@@ -27,12 +33,18 @@ async def fetch_climate_data(lat: float, lon: float, target_date: str) -> Climat
             data = response.json()
 
             daily = data.get("daily", {})
+            precipitation_values = daily.get("precipitation_sum") or daily.get("precipitation")
+            humidity_values = daily.get("relative_humidity_2m_mean") or daily.get("relativehumidity_2m_mean")
+            precipitation = float(precipitation_values[0]) if precipitation_values else 0.0
+            humidity = float(humidity_values[0]) if humidity_values else 0.0
             return ClimateData(
                 date=target_date,
                 tmin=daily["temperature_2m_min"][0],
                 tmax=daily["temperature_2m_max"][0],
                 tmean=daily["temperature_2m_mean"][0],
                 lat=lat,
+                precipitation=precipitation,
+                humidity=humidity,
                 source="API",
             )
 
@@ -55,11 +67,15 @@ def _load_from_csv(lat: float, target_date: str) -> ClimateData:
         raise ValueError(f"No data found for {target_date} in local CSV.")
 
     row = record.iloc[0]
+    precip = float(row.get("precipitation", 0.0)) if hasattr(row, "get") else 0.0
+    humidity = float(row.get("humidity", 0.0)) if hasattr(row, "get") else 0.0
     return ClimateData(
         date=target_date,
         tmin=row["tmin"],
         tmax=row["tmax"],
         tmean=row["tmean"],
         lat=lat,
+        precipitation=precip,
+        humidity=humidity,
         source="CSV",
     )
