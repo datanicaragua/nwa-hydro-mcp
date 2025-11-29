@@ -37,8 +37,9 @@ We are submitting this project to the following tracks:
 We don't reinvent the wheel. We orchestrate the best tools:
 
 - **Data:** **Open-Meteo ERA5** (API) + **Local CSV Fallback** (Resilience).
-- **Science:** **Hargreaves ETo Model** (via `pyeto`) for deterministic water demand calculation.
+- **Science:** **Hargreaves-Samani ETo Model** (native FAO-56 math) for deterministic water demand calculation.
 - **Intelligence:** **Google Gemini 2.5 Flash Lite** for semantic reasoning with JSON schema enforcement.
+- **Visualization:** **Plotly Express + Gradio 6** dual-axis chart (precipitation supply vs. ETo demand) with dark-mode readability.
 
 ### 2. Data Fusion Architecture
 
@@ -106,12 +107,20 @@ nwa-hydro-mcp/
     python app.py
     ```
 
+### What's New in V5.0 (Scientific Gold Edition)
+
+- Command Center layout with **site presets** (Matagalpa / El Crucero / Custom) that auto-fill coordinates.
+- **Dual-axis Plotly Express chart** (bars = precipitation supply, line = ETo demand) with dark-mode grid/labels.
+- **Risk badges** in the Gemini insight (🔴/🟡/🟢) and an **About** accordion citing Hargreaves-Samani (1985), ERA5 reanalysis, and toolchain credits (Pandas, Plotly, Gradio).
+- Footer links to **Gemini 2.5 Flash Lite, FastMCP, Claude Desktop, Open-Meteo API**, and the GitHub repo.
+
 ## 🗺️ 72-Hour Roadmap
 
 - [x] **Phase 1: Architecture** (Strategy & Scaffolding Complete)
 - [x] **Phase 2: Core Logic** (Data Fusion & Hargreaves Implementation)
 - [x] **Phase 3: Intelligence** (Gemini Integration)
-- [ ] **Phase 4: Deployment** (Hugging Face Spaces & Video)
+- [x] **Phase 4: UI Polish V5** (Command Center + About accordion + footer credits)
+- [ ] **Phase 5: Deployment** (Hugging Face Spaces & Video)
 
 ---
 
