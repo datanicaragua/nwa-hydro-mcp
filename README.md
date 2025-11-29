@@ -28,7 +28,7 @@ We are submitting this project to the following tracks:
 | :------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
 | **Track 1: Building MCP**  | A robust **FastMCP Server** (`src/nwa_hydro`) exposing atomic tools for Data Fusion and Science. Compatible with **Claude Desktop**. |
 | **Track 2: MCP in Action** | A **Gradio 6 Web UI** (`app.py`) that consumes these tools to visualize drought risk graphs.                                         |
-| **Google Gemini Prize**    | **Core Integration.** We use **Gemini 1.5 Flash** as an expert agronomist to interpret numerical ETo data into textual advice.       |
+| **Google Gemini Prize**    | **Core Integration.** We use **Gemini 2.5 Flash Lite** as an expert agronomist to interpret numerical ETo data into textual advice.   |
 
 ## 🌟 Key Differentiators
 
@@ -38,7 +38,7 @@ We don't reinvent the wheel. We orchestrate the best tools:
 
 - **Data:** **Open-Meteo ERA5** (API) + **Local CSV Fallback** (Resilience).
 - **Science:** **Hargreaves ETo Model** (via `pyeto`) for deterministic water demand calculation.
-- **Intelligence:** **Google Gemini** for semantic reasoning.
+- **Intelligence:** **Google Gemini 2.5 Flash Lite** for semantic reasoning with JSON schema enforcement.
 
 ### 2. Data Fusion Architecture
 
@@ -59,7 +59,7 @@ nwa-hydro-mcp/
 │   └── tools/              # Atomic Logic
 │       ├── fusion.py       # Data Fetching (API + CSV)
 │       ├── science.py      # Hargreaves ETo Logic
-│       └── intelligence.py # Gemini 1.5 Integration
+│       └── intelligence.py # Gemini 2.5 Lite Integration
 ├── docs/                   # Strategy & Architecture Documentation
 └── pyproject.toml          # PEP 621 Configuration
 ```
@@ -109,8 +109,8 @@ nwa-hydro-mcp/
 ## 🗺️ 72-Hour Roadmap
 
 - [x] **Phase 1: Architecture** (Strategy & Scaffolding Complete)
-- [ ] **Phase 2: Core Logic** (Data Fusion & Hargreaves Implementation)
-- [ ] **Phase 3: Intelligence** (Gemini Integration)
+- [x] **Phase 2: Core Logic** (Data Fusion & Hargreaves Implementation)
+- [x] **Phase 3: Intelligence** (Gemini Integration)
 - [ ] **Phase 4: Deployment** (Hugging Face Spaces & Video)
 
 ---
@@ -125,3 +125,6 @@ Built with ❤️ by <a href="https://github.com/datanicaragua">Data Nicaragua</
 
 [![GitHub](https://img.shields.io/badge/GitHub-gustavoemc-black?logo=github)](https://github.com/gustavoemc)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/gustavoernestom)
+
+## Development Setup
+See `CONTRIBUTING.md` for setup, testing, and run commands.
