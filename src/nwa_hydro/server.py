@@ -17,7 +17,20 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize FastMCP Server
-mcp = FastMCP("NWA Hydro Intelligence")
+# Define the MCP Server with rich metadata
+# This helps Claude Desktop understand the server's purpose and requirements.
+mcp = FastMCP(
+    "NWA Hydro Intelligence",
+    dependencies=[
+        "fastmcp",
+        "pydantic",
+        "google-generativeai",
+        "httpx",
+        "pandas",
+        "python-dotenv"
+    ],
+    description="Hydrological intelligence system for Nicaraguan agriculture. Provides real-time weather, ETo calculations, and AI-driven agronomic advice."
+)
 _START_TIME = time.monotonic()
 
 
@@ -45,6 +58,7 @@ def _error_payload(message: str, detail: str | None = None) -> str:
 async def get_climate_data(lat: float, lon: float, date: str) -> str:
     """
     Fetch climate data for a given location and date.
+    Use this tool first to get the raw environmental data.
     Returns a JSON string of the ClimateData.
     """
     _validate_inputs(lat, lon, date)
@@ -56,6 +70,7 @@ async def get_climate_data(lat: float, lon: float, date: str) -> str:
 def calculate_eto(climate_data_json: str) -> str:
     """
     Calculate ETo from ClimateData JSON.
+    Requires meteorological data as input.
     Returns a JSON string of the EToResult.
     """
     data = ClimateData.model_validate_json(climate_data_json)
@@ -67,6 +82,7 @@ def calculate_eto(climate_data_json: str) -> str:
 async def get_agronomist_advice(eto_result_json: str) -> str:
     """
     Generate agronomist advice from EToResult JSON.
+    Use this tool to get the final actionable advice for the farmer.
     Returns a JSON string of the AgronomistInsight or a user-friendly error JSON.
     """
     try:
