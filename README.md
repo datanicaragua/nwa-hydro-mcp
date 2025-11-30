@@ -111,6 +111,8 @@ nwa-hydro-mcp/
 
 - Command Center layout with **site presets** (Matagalpa / El Crucero / Custom) that auto-fill coordinates.
 - **Dual-axis Plotly Express chart** (bars = precipitation supply, line = ETo demand) with dark-mode grid/labels.
+- **Progressive loading:** KPIs and charts render immediately; Gemini insight streams in a second step with a loading placeholder.
+- **Skeleton KPIs** on first load to avoid blank dashboards; auto-load triggers the default analysis at page open.
 - **Risk badges** in the Gemini insight (🔴/🟡/🟢) and an **About** accordion citing Hargreaves-Samani (1985), ERA5 reanalysis, and toolchain credits (Pandas, Plotly, Gradio).
 - Footer links to **Gemini 2.5 Flash Lite, FastMCP, Claude Desktop, Open-Meteo API**, and the GitHub repo.
 
