@@ -44,12 +44,20 @@ def _parse_risk(text: str) -> str:
 def _build_prompt(eto_result: EToResult) -> str:
     return dedent(
         f"""
-        Data:
-        - Date: {eto_result.date}
-        - ETo: {eto_result.eto:.2f} mm/day
-        - Temp: {eto_result.input_data.tmean:.1f} C
+        You are an expert Agronomist providing an executive summary for a farmer.
 
-        Provide a concise irrigation risk assessment for the crop.
+        Dashboard Data:
+        - Date: {eto_result.date}
+        - Mean Temperature: {eto_result.input_data.tmean:.1f} °C
+        - Precipitation: {eto_result.input_data.precipitation:.1f} mm
+        - Humidity: {eto_result.input_data.humidity:.1f} %
+        - Reference Evapotranspiration (ETo): {eto_result.eto:.2f} mm/day
+
+        Task:
+        1. Analyze the water balance (Precipitation vs ETo).
+        2. Determine the irrigation risk (Low, Medium, High).
+        3. Provide a concise, professional executive summary (max 3 sentences).
+        4. Give one specific, actionable recommendation.
         """
     ).strip()
 
