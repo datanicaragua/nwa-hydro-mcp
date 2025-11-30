@@ -1,3 +1,19 @@
+---
+title: NWA Hydro Compute
+emoji: 💧
+colorFrom: blue
+colorTo: green
+sdk: gradio
+sdk_version: "5.0.1"
+app_file: app.py
+pinned: false
+license: apache-2.0
+tags:
+  - building-mcp-track-01
+  - mcp-in-action-track-01
+short_description: Precision Water Risk Engine for Nicaragua
+---
+
 # NWA Hydro-Compute: Precision Water Risk Engine
 
 <div align="center">
