@@ -6,7 +6,7 @@
 | Science Tool (Hargreaves via PyETo)       | Gustavo (Science)  | 2025-11-27 | ✅ Completed | `calculate_hargreaves_eto` matches FAO-56 spec using `pyeto`.                                     |
 | Intelligence Tool (Gemini 2.5 Flash Lite) | Gustavo (AI)       | 2025-11-28 | ✅ Completed | `generate_agronomist_insight` now async + JSON schema with `gemini-2.5-flash-lite`.               |
 | FastMCP Server wiring (`server.py`)       | Gustavo (Backend)  | 2025-11-27 | ✅ Completed | Tools exposed via FastMCP for Claude Desktop.                                                     |
-| Gradio UI (`app.py`) trend + insight view | Gustavo (Frontend) | 2025-11-29 | ✅ Completed | V5 Command Center: site presets, dual-axis Plotly Express chart, dark-mode legend/grid, risk badges, About accordion + footer credits. |
+| Gradio UI (`app.py`) trend + insight view | Gustavo (Frontend) | 2025-11-30 | ✅ Completed | V5 Command Center: site presets, dual-axis Plotly Express chart, dark-mode legend/grid, risk badges, About accordion + footer credits. Progressive loading with skeleton KPIs and async Gemini insight. |
 | HF Spaces deployment & secrets            | Ops                | 2025-11-29 | ⏳ Pending   | Package Space assets, push `requirements.txt`, add `GOOGLE_API_KEY` secret.                       |
 | Claude Desktop validation (Track 1)       | Ops                | 2025-11-29 | ⏳ Pending   | Run `mcp-inspector` + Claude Desktop demo after deployment.                                       |
 | Submission package (video + README tags)  | Comms              | 2025-11-30 | ⏳ Pending   | Record 3-min demo, verify README badges, prep social post.                                        |
