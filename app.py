@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime, timedelta
 from textwrap import dedent
 
@@ -10,9 +9,10 @@ import gradio as gr
 import pandas as pd
 import plotly.express as px
 
-from src.nwa_hydro.tools.fusion import fetch_climate_data
+from src.nwa_hydro.tools.fusion import fetch_climate_data, fetch_climate_range
 from src.nwa_hydro.tools.intelligence import generate_agronomist_insight
 from src.nwa_hydro.tools.science import calculate_hargreaves_eto
+from src.nwa_hydro.schemas import EToResult
 
 
 SITES = {
@@ -53,8 +53,14 @@ body {background: var(--ocean-bg); color: var(--ocean-text);}
 .hero-title {font-size: 24px; font-weight: 800; margin: 0;}
 .hero-sub {color: var(--ocean-accent-soft); font-weight: 600; margin-top: 4px;}
 .footer {text-align: center; color: var(--ocean-muted); margin-top: 16px; font-size: 13px;}
-.footer a {color: var(--ocean-accent-soft); text-decoration: none;}
-.footer a:hover {text-decoration: underline;}
+.footer a { color: #e9f1ff !important; text-decoration: underline; font-weight: 600; transition: color 0.2s ease-in-out; }
+.footer a:visited,
+.footer a:active { color: #e9f1ff !important; }
+.footer a:hover { color: #9bc2ff !important; text-decoration: underline; }
+
+.custom-accordion .icon { color: #9bc2ff !important; }
+.custom-accordion { background: #18233a !important; border-radius: 8px; border: 1px solid #4f7df3; }
+.custom-accordion button { color: #e9f1ff !important; font-weight: 700; }
 </style>
 """
 
@@ -96,81 +102,82 @@ def _safe_float(value, default=0.0) -> float:
 
 async def analyze_hydro(lat: float, lon: float, date_str: str):
     """
-    Returns: mean_temp, precip, humidity, df_plot (Date/ETo/Precipitation), md_output.
+    Returns: mean_temp, precip, humidity, df_plot (Date/ETo/Precipitation), eto_json, md_output.
     """
     try:
-        # Day-of interest
-        climate = await fetch_climate_data(lat, lon, date_str)
+        target_date = datetime.strptime(date_str, "%Y-%m-%d")
+        start_date_str = (target_date - timedelta(days=6)).strftime("%Y-%m-%d")
+        # Try fetching range first (single call)
+        try:
+            range_results = await fetch_climate_range(lat, lon, start_date_str, date_str)
+        except Exception:
+            range_results = []
+
+        # Derive day-of record
+        day_climate = None
+        if range_results:
+            day_climate = next((c for c in range_results if c.date == date_str), range_results[-1])
+        else:
+            # Fallback: single-day fetch
+            try:
+                day_climate = await fetch_climate_data(lat, lon, date_str)
+            except Exception:
+                day_climate = None
 
         # Primary KPIs
-        mean_temp = _safe_float(getattr(climate, "tmean", None))
-        precip = _safe_float(getattr(climate, "precipitation", None))
-        humidity = _safe_float(getattr(climate, "humidity", None))
+        mean_temp = _safe_float(getattr(day_climate, "tmean", None))
+        precip = _safe_float(getattr(day_climate, "precipitation", None))
+        humidity = _safe_float(getattr(day_climate, "humidity", None))
 
         # ETo + AI insight
-        eto_result = calculate_hargreaves_eto(climate)
-        insight = await generate_agronomist_insight(eto_result)
+        eto_result = calculate_hargreaves_eto(day_climate) if day_climate else None
 
-        # 7-day window (parallel fetch)
-        target_date = datetime.strptime(date_str, "%Y-%m-%d")
-        date_strings = [
-            (target_date - timedelta(days=i)).strftime("%Y-%m-%d")
-            for i in range(6, -1, -1)
-        ]
-        fetch_tasks = [fetch_climate_data(lat, lon, d) for d in date_strings]
-        results = await asyncio.gather(*fetch_tasks, return_exceptions=True)
-
+        # Chart rows from range results (or empty)
         rows: list[dict[str, float | str]] = []
-        for idx, result in enumerate(results):
-            day = date_strings[idx]
-            if isinstance(result, Exception):
-                rows.append({"Date": day, "ETo": 0.0, "Precipitation": 0.0})
-                continue
-            eto_value = 0.0
+        for res in range_results:
+            eto_val = 0.0
             try:
-                eto_value = _safe_float(calculate_hargreaves_eto(result).eto)
+                eto_val = _safe_float(calculate_hargreaves_eto(res).eto)
             except Exception:
-                eto_value = 0.0
-            day_precip = _safe_float(getattr(result, "precipitation", None))
-            rows.append({"Date": day, "ETo": eto_value, "Precipitation": day_precip})
+                eto_val = 0.0
+            rows.append(
+                {
+                    "Date": res.date,
+                    "ETo": eto_val,
+                    "Precipitation": _safe_float(getattr(res, "precipitation", 0.0)),
+                }
+            )
 
-        df_plot = pd.DataFrame(rows)
+        df_plot = pd.DataFrame(rows).sort_values("Date") if rows else pd.DataFrame({"Date": [], "ETo": [], "Precipitation": []})
 
-        risk_badge = {
-            "High": "<span style='color:#ef4444;font-weight:800'>🔴 HIGH</span>",
-            "Medium": "<span style='color:#f59e0b;font-weight:800'>🟡 MEDIUM</span>",
-            "Low": "<span style='color:#22c55e;font-weight:800'>🟢 LOW</span>",
-        }.get(insight.risk_level, insight.risk_level)
+        eto_json = eto_result.model_dump_json() if eto_result else None
+        placeholder_md = (
+            "## 🌿 Agronomist Insight\n\n"
+            "**Summary:** Calculating insight with Gemini...\n\n"
+            "**Advice:** Please wait while AI completes analysis.\n\n"
+            "**Risk Level:** ⏳\n\n"
+            "**ETo Value:** -- mm/day"
+        )
 
-        md_output = dedent(
-            f"""
-            ## 🌿 Agronomist Insight
-
-            **Summary:** {insight.summary}
-
-            **Advice:** {insight.advice}
-
-            **Risk Level:** {risk_badge}
-
-            **ETo Value:** {insight.eto_value:.2f} mm/day
-            """
-        ).strip()
-
-        return mean_temp, precip, humidity, df_plot, md_output
+        return mean_temp, precip, humidity, df_plot, eto_json, placeholder_md
 
     except Exception as e:  # noqa: BLE001
         empty_df = pd.DataFrame(columns=["Date", "ETo", "Precipitation"])
-        return 0.0, 0.0, 0.0, empty_df, f"Error: {str(e)}"
+        return 0.0, 0.0, 0.0, empty_df, None, f"Error: {str(e)}"
 
 
 def render_kpis(mean_temp: float, precip: float, humidity: float):
     def card(label: str, value: float, unit: str, icon: str, extra_class: str = "") -> str:
+        if value is None:
+            display = "--"
+        else:
+            display = f"{value:.1f}{unit}"
         return f"""
         <div class="kpi-card {extra_class}">
             <div class="kpi-icon">{icon}</div>
             <div>
                 <div class="kpi-label">{label}</div>
-                <div class="kpi-value">{value:.1f}{unit}</div>
+                <div class="kpi-value">{display}</div>
             </div>
         </div>
         """
@@ -197,6 +204,9 @@ def render_chart(df_plot: pd.DataFrame | None):
         opacity=0.8,
         color_discrete_sequence=["#4f7df3"],
     )
+    # Rename bar trace for clarity
+    if bar_fig.data:
+        bar_fig.data[0].name = "Precipitation (Supply)"
     line_fig = px.line(
         df_plot,
         x="Date",
@@ -259,6 +269,50 @@ def _select_site(choice: str, current_lat: float, current_lon: float):
     return coords
 
 
+async def generate_insight_only(lat: float, lon: float, date_str: str, eto_json: str | None):
+    """Generate insight separately to avoid blocking chart rendering."""
+    try:
+        eto_result = None
+        if eto_json:
+            try:
+                eto_result = EToResult.model_validate_json(eto_json)
+            except Exception:
+                eto_result = None
+
+        if eto_result is None:
+            # Fallback: recompute quickly
+            climate = await fetch_climate_data(lat, lon, date_str)
+            eto_result = calculate_hargreaves_eto(climate)
+
+        insight = await generate_agronomist_insight(eto_result)
+        risk_badge = {
+            "High": "<span style='color:#ef4444;font-weight:800'>🔴 HIGH</span>",
+            "Medium": "<span style='color:#f59e0b;font-weight:800'>🟡 MEDIUM</span>",
+            "Low": "<span style='color:#22c55e;font-weight:800'>🟢 LOW</span>",
+        }.get(getattr(insight, "risk_level", None), getattr(insight, "risk_level", "Unknown"))
+
+        md_output = dedent(
+            f"""
+            ## 🌿 Agronomist Insight
+
+            **Summary:** {getattr(insight, "summary", "Data unavailable")}
+
+            **Advice:** {getattr(insight, "advice", "No advice available")}
+
+            **Risk Level:** {risk_badge}
+
+            **ETo Value:** {getattr(insight, "eto_value", 0.0):.2f} mm/day
+            """
+        ).strip()
+
+        return md_output
+
+    except Exception as exc:  # noqa: BLE001
+        return f"Error generating insight: {exc}"
+
+# Initial skeleton cards must be defined before UI construction
+_SKELETON_MEAN, _SKELETON_PRECIP, _SKELETON_HUMIDITY = render_kpis(None, None, None)
+
 # Gradio UI
 with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
     gr.HTML(OCEAN_STYLE)
@@ -275,6 +329,7 @@ with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
     precip_state = gr.State()
     humidity_state = gr.State()
     df_state = gr.State()
+    eto_state = gr.State()
 
     with gr.Row(equal_height=True):
         with gr.Column(scale=1):
@@ -290,7 +345,7 @@ with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
                     placeholder="YYYY-MM-DD",
                     info="Format: YYYY-MM-DD",
                 )
-                with gr.Accordion("Advanced Coordinates", open=False):
+                with gr.Accordion("Advanced Coordinates", open=False, elem_classes="custom-accordion"):
                     lat_input = gr.Number(label="Latitude", value=12.9256)
                     lon_input = gr.Number(label="Longitude", value=-85.9189)
                 btn = gr.Button("Analyze Water Deficit", variant="primary", elem_classes="cta-btn")
@@ -298,9 +353,9 @@ with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
         with gr.Column(scale=3):
             gr.Markdown("### Dashboard")
             with gr.Row(elem_classes="kpi-row"):
-                mean_card = gr.Markdown(elem_classes="kpi-card kpi-temp")
-                precip_card = gr.Markdown(elem_classes="kpi-card kpi-precip")
-                humidity_card = gr.Markdown(elem_classes="kpi-card kpi-humidity")
+                mean_card = gr.Markdown(_SKELETON_MEAN)
+                precip_card = gr.Markdown(_SKELETON_PRECIP)
+                humidity_card = gr.Markdown(_SKELETON_HUMIDITY)
             loading_msg = gr.Markdown(visible=False)
             plot_output = gr.Plot(label="Water Balance Chart")
             output_md = gr.Markdown(label="Gemini Insight")
@@ -308,7 +363,7 @@ with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
     # About + footer
     with gr.Row():
         with gr.Column():
-            with gr.Accordion("ℹ️ About the Application, Methodology & Data Sources", open=False):
+            with gr.Accordion("ℹ️ About the Application, Methodology & Data Sources", open=False, elem_classes="custom-accordion"):
                 gr.Markdown(ABOUT_MD)
             gr.HTML(
                 """
@@ -327,7 +382,7 @@ with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
     ).then(
         analyze_hydro,
         inputs=[lat_input, lon_input, date_input],
-        outputs=[mean_state, precip_state, humidity_state, df_state, output_md],
+        outputs=[mean_state, precip_state, humidity_state, df_state, eto_state, output_md],
     ).then(
         render_kpis,
         inputs=[mean_state, precip_state, humidity_state],
@@ -337,9 +392,32 @@ with gr.Blocks(title="nwa-hydro-mcp Command Center") as demo:
         inputs=df_state,
         outputs=plot_output,
     ).then(
+        generate_insight_only,
+        inputs=[lat_input, lon_input, date_input, eto_state],
+        outputs=output_md,
+    ).then(
         hide_loading,
         outputs=loading_msg,
         queue=False,
+    )
+
+    # Auto-load demo with defaults on page load
+    demo.load(
+        analyze_hydro,
+        inputs=[lat_input, lon_input, date_input],
+        outputs=[mean_state, precip_state, humidity_state, df_state, eto_state, output_md],
+    ).then(
+        render_kpis,
+        inputs=[mean_state, precip_state, humidity_state],
+        outputs=[mean_card, precip_card, humidity_card],
+    ).then(
+        render_chart,
+        inputs=df_state,
+        outputs=plot_output,
+    ).then(
+        generate_insight_only,
+        inputs=[lat_input, lon_input, date_input, eto_state],
+        outputs=output_md,
     )
 
     site_select.change(
