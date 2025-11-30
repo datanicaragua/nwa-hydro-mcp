@@ -12,3 +12,4 @@
 | 2025-11-29           | UI V5 "Scientific Gold" release (site presets, risk badges, About)       | Frontend Squad | Increases demo clarity & credibility         | Capture refreshed screenshots for README + submission.            |
 | 2025-11-29           | Plotly Express dual-axis chart + dark-mode legend/text fix                | Frontend Squad | Ensures data readability in hackathon demo   | Keep `font.color` and `gridcolor` pinned in `render_chart`.       |
 | 2025-11-29           | Gradio Blocks `theme` fix documented (launch-only)                       | Frontend Squad | Prevents runtime crashes on Gradio 6.0.1     | Leave note in NT_002 + README for future upgrades.                |
+| 2025-11-30           | Progressive loading + skeleton KPIs + auto-load defaults                 | Frontend Squad | Faster perceived UX; avoids blank dashboard  | Keep Gemini insight as async step; maintain placeholder messaging.|
