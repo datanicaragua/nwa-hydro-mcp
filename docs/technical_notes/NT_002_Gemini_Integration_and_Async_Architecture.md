@@ -43,6 +43,13 @@ Since we are using **Gradio 6**, standard documentation often lags behind the co
 
 We used Python's `inspect` module to validate parameters for `gr.Blocks` and `launch()` and avoided undocumented args.
 
+### D. Location-Aware UI + Map Integration (Nov 30 War Room)
+
+- Added a **Maplibre plot** that mirrors searches and scenario presets so demo judges see the geo context immediately.
+- Introduced `current_location_state` to store the active label (Matagalpa, El Crucero, ad-hoc query). The state flows through `analyze_hydro` and Gemini prompts, ensuring every card references the right site.
+- Wrapped preset buttons in `set_preset_location(...)` helpers so lat/lon, zoom, and map label stay in sync. This removed brittle inline lambdas and simplified reuse when adding more presets.
+- Removed the duplicated Blocks layout + `__main__` guard that an earlier assistant appended. This cleaned up `app.py`, avoided double `demo.launch()` calls, and unblocked Hugging Face deployment.
+
 ## 3\. Operational Command Reference (Windows/PowerShell)
 
 The following commands are the **standard operating procedure** for this project. Prefer the
@@ -88,18 +95,28 @@ _Note: We use `\.venv\Scripts\python.exe` explicitly to avoid conflicts with glo
 
 ## 4\. Troubleshooting Guide (Lessons Learned)
 
-| Symptom                                             | Probable Cause                                                   | Fix Command / Action                                                                                                                                   |
-| :-------------------------------------------------- | :--------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`AttributeError: ...response_schema`**            | Outdated Google SDK.                                             | `pip install -U google-generativeai`                                                                                                                   |
-| **`TypeError: BlockContext.__init__() got an unexpected keyword argument 'theme'`** | Passing `theme` to `gr.Blocks` on Gradio 6.                         | Remove `theme` from `Blocks`; pass `theme=` only in `demo.launch(...)`.                                                                                |
-| **`ImportError: relative import...`**               | Running script as `__main__` without package context.            | Prepend `$env:PYTHONPATH = "src";`                                                                                                                     |
-| **`Finish Reason: SAFETY`**                         | Model hallucinating danger in scientific text.                   | Switch to `gemini-2.5-flash-lite` & enforce JSON.                                                                                                      |
-| **`429 Too Many Requests`**                         | Open-Meteo API parallel fetching.                                | Added `asyncio.sleep(0.25)` in data fetch loop.                                                                                                        |
-| **Dev Server Failed (FastMCP)**                     | Port locked or relative import error.                            | Use absolute imports in `server.py` (e.g., `from nwa_hydro.schemas...`).                                                                               |
-| **Dark chart labels invisible**                     | Default Plotly colors on dark background.                        | Set `font.color='#e5e7eb'`, `gridcolor='#374151'`, transparent `plot_bgcolor/paper_bgcolor` in `render_chart`.                                         |
-| **UI blocked ~20s on load (Gemini latency)**        | Insight generation tied to the main fetch.                       | Split UI flow: fetch/render KPIs+chart first; call Gemini in a separate `.then` with a placeholder message.                                            |
-| **MCP Inspector `ERR_CONNECTION_REFUSED`**          | Browser/VPN blocks IPv6 loopback while inspector binds to `::1`. | Run the helper script (forces IPv4), temporarily disable VPN/Threat Protection, or allow `127.0.0.1` in the firewall.                                  |
-| **Inspector "Invalid origin" / "Connection Error"** | UI missing proxy address/token.                                  | Copy both values printed by the helper script (e.g., `http://127.0.0.1:6277` and session token) into the Connection panel before pressing **Connect**. |
+| Symptom                                                                             | Probable Cause                                                   | Fix Command / Action                                                                                                                                   |
+| :---------------------------------------------------------------------------------- | :--------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`AttributeError: ...response_schema`**                                            | Outdated Google SDK.                                             | `pip install -U google-generativeai`                                                                                                                   |
+| **`TypeError: BlockContext.__init__() got an unexpected keyword argument 'theme'`** | Passing `theme` to `gr.Blocks` on Gradio 6.                      | Remove `theme` from `Blocks`; pass `theme=` only in `demo.launch(...)`.                                                                                |
+| **`ImportError: relative import...`**                                               | Running script as `__main__` without package context.            | Prepend `$env:PYTHONPATH = "src";`                                                                                                                     |
+| **`Finish Reason: SAFETY`**                                                         | Model hallucinating danger in scientific text.                   | Switch to `gemini-2.5-flash-lite` & enforce JSON.                                                                                                      |
+| **`429 Too Many Requests`**                                                         | Open-Meteo API parallel fetching.                                | Added `asyncio.sleep(0.25)` in data fetch loop.                                                                                                        |
+| **Dev Server Failed (FastMCP)**                                                     | Port locked or relative import error.                            | Use absolute imports in `server.py` (e.g., `from nwa_hydro.schemas...`).                                                                               |
+| **Dark chart labels invisible**                                                     | Default Plotly colors on dark background.                        | Set `font.color='#e5e7eb'`, `gridcolor='#374151'`, transparent `plot_bgcolor/paper_bgcolor` in `render_chart`.                                         |
+| **UI blocked ~20s on load (Gemini latency)**                                        | Insight generation tied to the main fetch.                       | Split UI flow: fetch/render KPIs+chart first; call Gemini in a separate `.then` with a placeholder message.                                            |
+| **MCP Inspector `ERR_CONNECTION_REFUSED`**                                          | Browser/VPN blocks IPv6 loopback while inspector binds to `::1`. | Run the helper script (forces IPv4), temporarily disable VPN/Threat Protection, or allow `127.0.0.1` in the firewall.                                  |
+| **Inspector "Invalid origin" / "Connection Error"**                                 | UI missing proxy address/token.                                  | Copy both values printed by the helper script (e.g., `http://127.0.0.1:6277` and session token) into the Connection panel before pressing **Connect**. |
+
+## 5. War Room Stabilization Summary (Nov 30)
+
+| Priority | Action                                                        | Outcome                                                                                 |
+| :------- | :------------------------------------------------------------ | :-------------------------------------------------------------------------------------- |
+| 1        | Add interactive map + presets + label state                   | Sponsors can visually confirm Matagalpa / Dry Corridor selections in the UI screenshot. |
+| 2        | Polish Gemini “brain” prompt + placeholder flow               | Executive summary now includes risk badge + ETo demand, no blocking spinner loops.      |
+| 3        | Remove duplicate Blocks + rerun smoke tests (`python app.py`) | Single, stable UI definition; HF deployment scripts no longer double-launch the server. |
+
+The screenshot embedded in the README reflects this stabilized architecture and should be reused in submissions.
 
 ---
 
