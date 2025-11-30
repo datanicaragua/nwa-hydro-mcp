@@ -1,10 +1,13 @@
-# NWA Hydro-Compute MCP 💧
+# NWA Hydro-Compute: Precision Water Risk Engine
 
 <div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![MCP](https://img.shields.io/badge/Protocol-MCP-green)
-![Status](https://img.shields.io/badge/Status-War_Room_Mode-red)
+![Status](https://img.shields.io/badge/Status-Released_v1.0-success)
+
+![NWA Hydro-Compute Dashboard v1.0](docs/images/nwa-dashboard-ui-v1.png)
+<em>Figure 1: Live Dashboard v1.0 featuring Maplibre Geospatial Integration and Real-time Water Balance Analysis.</em>
 
 **The specialized hydrological computational engine for the [Nicaragua Weather Archive](https://github.com/datanicaragua).**
 
@@ -39,7 +42,7 @@ We don't reinvent the wheel. We orchestrate the best tools:
 - **Data:** **Open-Meteo ERA5** (API) + **Local CSV Fallback** (Resilience).
 - **Science:** **Hargreaves-Samani ETo Model** (native FAO-56 math) for deterministic water demand calculation.
 - **Intelligence:** **Google Gemini 2.5 Flash Lite** for semantic reasoning with JSON schema enforcement.
-- **Visualization:** **Plotly Express + Gradio 6** dual-axis chart (precipitation supply vs. ETo demand) with dark-mode readability.
+- **Visualization:** **Plotly Express + Gradio 6** dual-axis chart (precipitation supply vs. ETo demand) with Dark Mode UI readability and Geospatial Visualization via **Maplibre** for site context.
 
 ### 2. Data Fusion Architecture
 
@@ -47,6 +50,13 @@ Most hackathon projects break if the API goes down. Ours features a **Fail-Safe 
 
 - _Primary:_ Live API Fetch.
 - _Fallback:_ Automatically switches to the NWA Local Archive (`data/local_station.csv`) if the API is unreachable or if ground-truth calibration is requested.
+
+## 🏗️ System Architecture
+
+The v1.0 pipeline ingests Open-Meteo ERA5 data, normalizes it through the fusion engine, computes Hargreaves-Samani ETo, and serves both the Maplibre front-end and Gemini insights while falling back to the local archive when needed.
+
+![System Architecture and Data Flow](docs/images/nwa-system-architecture-v1.png)
+<em>Figure 2: End-to-End Data Pipeline: From Open-Meteo ingestion to Gemini 2.0 Flash insights.</em>
 
 ## 📂 Repository Structure
 
@@ -107,41 +117,12 @@ nwa-hydro-mcp/
     python app.py
     ```
 
-### What's New in V5.1 (War Room Stabilization)
+## 🛡 V5.1 "Command Center" Release Features
 
-- Command Center layout now pairs the coordinate inputs with an **interactive Maplibre view** that reflects searches, presets, and stored labels for sponsors to see context instantly.
-- **Site presets + location state**: scenario buttons call `set_preset_location(...)` and keep a `current_location_state` so every analysis, KPI, and Gemini prompt references the exact target.
-- **Dual-axis Plotly Express chart** (bars = precipitation supply, line = ETo demand) with dark-mode grid/labels plus refreshed copy that mirrors the “Water Balance (7-Day Trend)” metric sponsors asked for.
-- **Progressive loading and async Gemini insight** refined: KPIs/charts update first, the agronomist summary runs as a follow-up step with a placeholder so UX never blocks.
-- **Skeleton KPIs + auto-load defaults** still fire on page load, now with a dynamic dashboard title (`📍 ANALYSIS TARGET`) that tracks the latest label (Matagalpa, El Crucero, ad-hoc search, etc.).
-- Dead duplicate UI blocks were removed from `app.py`, reducing launch confusion and ensuring `demo.launch()` runs once for Hugging Face Spaces deployability.
-
-### Still Shipping from V5.0 (Scientific Gold Edition)
-
-- Command Center layout with **site presets** (Matagalpa / El Crucero / Custom) that auto-fill coordinates.
-- **Dual-axis Plotly Express chart** (bars = precipitation supply, line = ETo demand) with dark-mode grid/labels.
-- **Progressive loading:** KPIs and charts render immediately; Gemini insight streams in a second step with a loading placeholder.
-- **Skeleton KPIs** on first load to avoid blank dashboards; auto-load triggers the default analysis at page open.
-- **Risk badges** in the Gemini insight (🔴/🟡/🟢) and an **About** accordion citing Hargreaves-Samani (1985), ERA5 reanalysis, and toolchain credits (Pandas, Plotly, Gradio).
-- Footer links to **Gemini 2.5 Flash Lite, FastMCP, Claude Desktop, Open-Meteo API**, and the GitHub repo.
-
-## 🛡 War Room Recovery Plan (Nov 30)
-
-To close the hackathon without “suiciding the project,” we executed the following 60-minute stabilization plan:
-
-1. **Integrate an interactive map + presets (Priority 1)** – Pair lat/lon inputs with a Maplibre widget, wire preset buttons through `set_preset_location`, and store the resolved label so sponsors can confirm the focus area.
-2. **Polish the agronomist “brain” (Priority 2)** – Ensure Gemini receives the full dashboard context (location label, KPIs, chart JSON) and emits an executive summary + irrigation risk badge without needing voice chat.
-3. **Final verification pass (Priority 3)** – Remove legacy duplicate Blocks definitions, rerun `python app.py`, and capture fresh screenshots for README/docs.
-
-Result: the UI screenshot above reflects the stabilized stack and is ready for Hugging Face deployment + sponsor demos.
-
-## 🗺️ 72-Hour Roadmap
-
-- [x] **Phase 1: Architecture** (Strategy & Scaffolding Complete)
-- [x] **Phase 2: Core Logic** (Data Fusion & Hargreaves Implementation)
-- [x] **Phase 3: Intelligence** (Gemini Integration)
-- [x] **Phase 4: UI Polish V5** (Command Center + About accordion + footer credits)
-- [ ] **Phase 5: Deployment** (Hugging Face Spaces & Video)
+- **Interactive Map Context:** Location inputs are paired with Maplibre geospatial visualization, site presets (Matagalpa/Dry Corridor), and visual context for sponsors.
+- **Dual-Axis Intelligence:** Plotly charts explicitly show the gap between **Supply** (Precipitation bars) and **Demand** (ETo line) in a specialized Dark Mode UI.
+- **Progressive Loading:** The UI never freezes; KPIs load instantly while Gemini 2.5 Flash Lite processes the agronomic reasoning asynchronously.
+- **Scientific Transparency:** Full disclosure of the Hargreaves-Samani methodology and ERA5 data sources directly in the UI "About" accordion.
 
 ---
 
