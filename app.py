@@ -91,8 +91,7 @@ body {background: var(--ocean-bg); color: var(--ocean-text);}
 
 ABOUT_MD = """
 ### 📺 Video Tour & Tutorial
-[![NWA Hydro-Compute Demo](https://img.youtube.com/vi/pqjqM5uAjC8/0.jpg)](https://www.youtube.com/watch?v=pqjqM5uAjC8)
-*Click the image above to watch a 2-minute walkthrough of the application.*
+[▶️ **Click here to watch the 2-minute walkthrough**](https://www.youtube.com/watch?v=pqjqM5uAjC8)
 
 ### 📚 Documentation
 For a deep dive into the architecture, MCP integration, and hackathon tracks, please visit the **[Project README](https://huggingface.co/spaces/datanicaragua/nwa-hydro-mcp/blob/main/README.md)**.
