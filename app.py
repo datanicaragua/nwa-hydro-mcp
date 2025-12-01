@@ -90,29 +90,32 @@ body {background: var(--ocean-bg); color: var(--ocean-text);}
 """
 
 ABOUT_MD = """
+### 📺 Video Tour & Tutorial
+[![NWA Hydro-Compute Demo](https://img.youtube.com/vi/pqjqM5uAjC8/0.jpg)](https://www.youtube.com/watch?v=pqjqM5uAjC8)
+*Click the image above to watch a 2-minute walkthrough of the application.*
+
+### 📚 Documentation
+For a deep dive into the architecture, MCP integration, and hackathon tracks, please visit the **[Project README](https://huggingface.co/spaces/datanicaragua/nwa-hydro-mcp/blob/main/README.md)**.
+
 ### 1. Application Purpose
-The **Nicaragua Weather Archive** is a visualization tool designed to facilitate access to and analysis of historical meteorological data. Its goal is to **empower citizens, students, farmers, and researchers** by enabling them to explore climate trends and make data-driven decisions.
+The **NWA Hydro-Compute** engine bridges the gap between raw climate data and actionable agronomic advice. It empowers farmers and researchers to answer: *"What is the water stress risk for my crop?"*
 
 ### 2. Data Source
-- **Primary Provider:** Data is sourced via the [Open-Meteo API](https://open-meteo.com/).
-- **Source Model:** **ERA5**, the fifth-generation atmospheric reanalysis of the global climate by **ECMWF**.
-- **What is "Reanalysis"?** Think of ERA5 as a high-tech "climate historian." It combines billions of observations (satellites, ground stations) with advanced physics models to reconstruct past weather globally, even in areas without stations.
+- **Primary Provider:** [Open-Meteo API](https://open-meteo.com/) (ERA5 Reanalysis).
+- **Model:** **ERA5** by **ECMWF** (Global Climate Reanalysis).
+- **Resolution:** ~11km grid (ERA5-Land).
 
-### 3. Calculation Methodology
-- **Mean Temp:** The true average of 24 hourly estimates (not just (Max+Min)/2).
-- **Total Precipitation:** Cumulative sum for the selected period.
-- **ETo (Evapotranspiration):** Calculated using the **Hargreaves-Samani (1985)** equation, calibrated for regional conditions when direct radiation data are missing.
+### 3. Scientific Methodology
+- **ETo (Evapotranspiration):** Calculated using the **Hargreaves-Samani (1985)** equation (FAO-56 standard for limited data).
+- **Water Balance:** Compares **Supply** (Precipitation) vs. **Demand** (ETo) to identify deficit periods.
 
-### 4. Accuracy & Limitations
-- **Nature of Data:** High-quality *estimates* for a grid area (~11km resolution), not single-point measurements.
-- **Resolution:** ERA5-Land (11km) for data from 1950+; ERA5 (30km) for older data.
-- **Usage:** Excellent for trends and regional analysis. Complementary to local rain gauges.
+### 4. AI & Intelligence Layer
+- **Reasoning:** **Google Gemini 2.5 Flash Lite** acts as an expert agronomist.
+- **Protocol:** Built on **FastMCP** (Model Context Protocol) for standardized tool use.
 
-### 5. Credits & Tools
+### 5. Credits
 - **Developer:** Gustavo Ernesto Martínez Cárdenas
-- **AI Stack:** Google Gemini 2.5 Flash Lite, FastMCP, Claude Desktop.
-- **Python Stack:** Pandas, Plotly, Gradio.
-- **Last Updated:** November 2025
+- **Stack:** Python 3.10, Gradio 6, Plotly, Maplibre.
 """
 
 
