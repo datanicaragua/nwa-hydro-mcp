@@ -114,6 +114,7 @@ The **NWA Hydro-Compute** engine bridges the gap between raw climate data and ac
 
 ### 5. Credits
 - **Developer:** Gustavo Ernesto Martínez Cárdenas
+  > _"From the coffee fields to the cloud: A journey through ecosystems, economy, and society."_ ([🎥 Watch Story](https://youtu.be/lDOruZl-yvo))
 - **Stack:** Python 3.10, Gradio 6, Plotly, Maplibre.
 """
 
