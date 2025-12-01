@@ -22,12 +22,15 @@ short_description: Precision Water Risk Engine for Nicaragua
 ![MCP](https://img.shields.io/badge/Protocol-MCP-green)
 ![Status](https://img.shields.io/badge/Status-Released_v1.0-success)
 
-![NWA Hydro-Compute Dashboard v1.0](docs/images/nwa-dashboard-ui-v1.png)
+Hydro-Compute Dashboard v1.0](docs/images/nwa-dashboard-ui-v1.png)
 <em>Figure 1: Live Dashboard v1.0 featuring Maplibre Geospatial Integration and Real-time Water Balance Analysis.</em>
 
 **The specialized hydrological computational engine for the [Nicaragua Weather Archive](https://github.com/datanicaragua).**
 
 _Built for the [Hugging Face MCP 1st Birthday Hackathon](https://huggingface.co/MCP-1st-Birthday) (Winter 2025)_
+
+### 📺 Video Tour
+[![NWA Hydro-Compute Demo](https://img.youtube.com/vi/pqjqM5uAjC8/0.jpg)](https://www.youtube.com/watch?v=pqjqM5uAjC8)
 
 </div>
 
