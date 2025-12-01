@@ -30,6 +30,7 @@ Hydro-Compute Dashboard v1.0](docs/images/nwa-dashboard-ui-v1.png)
 _Built for the [Hugging Face MCP 1st Birthday Hackathon](https://huggingface.co/MCP-1st-Birthday) (Winter 2025)_
 
 ### 📺 Video Tour
+
 [![NWA Hydro-Compute Demo](https://img.youtube.com/vi/pqjqM5uAjC8/0.jpg)](https://www.youtube.com/watch?v=pqjqM5uAjC8)
 
 </div>
