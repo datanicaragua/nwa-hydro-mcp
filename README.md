@@ -154,6 +154,14 @@ Built with ❤️ by <a href="https://github.com/datanicaragua">Data Nicaragua</
 [![GitHub](https://img.shields.io/badge/GitHub-gustavoemc-black?logo=github)](https://github.com/gustavoemc)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/gustavoernestom)
 
+### 🎥 The Story: From Machete to AI
+
+_From the coffee fields to the cloud: A journey through ecosystems, economy, and society._
+
+[![De Machete a Inteligencia Artificial](https://img.youtube.com/vi/lDOruZl-yvo/0.jpg)](https://youtu.be/lDOruZl-yvo)
+
+> _"Antes de los algoritmos, había botas de hule y cables en el lodo, midiendo el pulso del agua. El conocimiento se cultiva bajo el sol mucho antes de subir a la nube. Este proyecto integra cada mapa trazado y cada experiencia en el campo, porque la tecnología es solo la herramienta para responder cuando la naturaleza nos desafía. De la raíz... al código."_
+
 ## Development Setup
 
 See `CONTRIBUTING.md` for setup, testing, and run commands.
